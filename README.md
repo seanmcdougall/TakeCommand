@@ -3,7 +3,7 @@ Take Command enhances the External Command Seat so you can now assign crew to it
 
 Downloads
 - CurseForge (http://kerbal.curseforge.com/shareables/230395-take-command)
-- KerbalStuff (coming soon)
+- KerbalStuff (https://kerbalstuff.com/mod/776/Take%20Command)
 
 Known Issues
 - you will still get the "No Control" warning at launch, but it can be safely ignored
