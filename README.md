@@ -1,6 +1,9 @@
 # TakeCommand
 Take Command enhances the External Command Seat so you can now assign crew to it from within the VAB/SPH just like any other command module.  Just add one or more command seats to your ship, assign crew as usual, and launch!  Your Kerbal crew will automatically spawn and jump into their assigned seats.
 
+Forum Thread
+http://forum.kerbalspaceprogram.com/threads/120740-1-0-2-Take-Command-Launch-Kerbals-in-External-Command-Seats
+
 Downloads
 - Curse (http://www.curse.com/shareables/kerbal/230395-take-command)
 - KerbalStuff (https://kerbalstuff.com/mod/776/Take%20Command)
