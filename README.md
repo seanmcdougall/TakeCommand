@@ -6,7 +6,7 @@ Forum Thread
 http://forum.kerbalspaceprogram.com/threads/120740-1-0-2-Take-Command-Launch-Kerbals-in-External-Command-Seats
 
 Downloads
-- Curse (http://www.curse.com/shareables/kerbal/230395-take-command)
+- Curse (http://www.curse.com/ksp-mods/kerbal/230395-take-command)
 - KerbalStuff (https://kerbalstuff.com/mod/776/Take%20Command)
 
 Known Issues
