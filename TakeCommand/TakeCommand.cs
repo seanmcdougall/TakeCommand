@@ -24,61 +24,24 @@ using UnityEngine;
 
 namespace TakeCommand
 {
-    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
-    public class AddSeatModule : MonoBehaviour
+
+    public class TakeCommand : ModuleCommand
     {
-        private static bool initialized = false;
-
-        public void Update()
-        {
-            if (!initialized)
-            {
-                initialized = true;
-                addSeatModule();
-            }
-        }
-
-        private void addSeatModule()
-        {
-            try
-            {
-                ConfigNode node = new ConfigNode("MODULE");
-                node.AddValue("name", "TakeCommand");
-
-                var partInfo = PartLoader.getPartInfoByName("seatExternalCmd");
-                print("[TakeCommand] addSeatModule [" + Time.time + "]: Part info = " + partInfo);
-
-                var prefab = partInfo.partPrefab;
-                print("[TakeCommand] addSeatModule [" + Time.time + "]: Prefab = " + prefab);
-
-                prefab.CrewCapacity = 1;
-
-                var module = prefab.AddModule(node);
-                print("[TakeCommand] Did not detect expected exception in addSeatModule [" + Time.time + "]: Module = " + module);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("Object reference not set"))
-                {
-                    print("[TakeCommand] addSeatModule succeeded.");
-                }
-                else
-                {
-                    print("[TakeCommand] addSeatModule [" + Time.time + "]: Failed to add the part module to seatExternalCmd: " + ex.Message + "\n" + ex.StackTrace);
-                }
-            }
-        }
-    }
-
-    public class TakeCommand : PartModule
-    {
+        // Keep track of all the command seats that need to be emptied (shared across all instances)
         public static List<Part> allCommandSeats = new List<Part>();
 
+        // Variables to store the escape hatch and collider
         GameObject escapeHatch = null;
         BoxCollider escapeHatchCollider = null;
 
-        private bool boardKerbal = false;
+        // Name of the Kerbal who belongs in this seat
         private string myKerbal;
+        
+        // Whether or not the Kerbal has been ejected and should now be boarded
+        private bool boardKerbal = false;
+
+        // Whether processing is complete and the module can remove itself
+        private bool tcComplete = false;
 
         public override void OnStart(StartState state)
         {
@@ -118,6 +81,12 @@ namespace TakeCommand
                         print("[TakeCommand] added escape hatch to " + this.part.name + " (" + this.part.GetInstanceID() + ")");
                     }
                 }
+                else
+                {
+                    // No crew left to eject, disable the module
+                    tcComplete = true;
+                    
+                }
             }
             base.OnStart(state);
         }
@@ -130,6 +99,7 @@ namespace TakeCommand
                 {
                     if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.First().GetInstanceID() == this.part.GetInstanceID())
                     {
+                        // Time to eject this crew member
                         ProtoCrewMember kerbal = this.part.protoModuleCrew.Single();
                         print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
                         if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
@@ -150,33 +120,40 @@ namespace TakeCommand
                 }
                 else
                 {
-                    bool grabASeat = false;
-
-                    foreach (Vessel v in FlightGlobals.Vessels)
-                    {
-                        if (v.name == myKerbal && v.isActiveVessel)
-                        {
-                            grabASeat = true;
-                        }
-                    }
-
-                    if (grabASeat)
+                    // Check and wait until the ejected Kerbal is the active vessel before proceeding
+                    if (FlightGlobals.ActiveVessel.name == myKerbal)
                     {
                         KerbalEVA kerbal = FlightGlobals.ActiveVessel.GetComponent<KerbalEVA>();
 
                         if (kerbal.fsm.Started == true)
                         {
-
-                            boardKerbal = false;
                             allCommandSeats.Remove(allCommandSeats.First());
+                            boardKerbal = false;
+                            tcComplete = true;
                             print("[TakeCommand]  seating " + kerbal.name + " in " + this.part.GetInstanceID());
                             this.part.Modules.OfType<KerbalSeat>().Single().BoardSeat();
                         }
                     }
-
                 }
             }
             base.OnUpdate();
+        }
+
+        public void LateUpdate()
+        {
+            // Remove this module after processing all other updates to avoid an error in the log
+            if (tcComplete)
+            {
+                print("[TakeCommand] deactivating module for " + this.part.GetInstanceID());
+                PartModule m = this.part.Modules.OfType<TakeCommand>().Single();
+                this.part.RemoveModule(m);
+            }
+        }
+
+        public override void OnSave(ConfigNode node)
+        {
+            // Tell ModuleManager that I use dynamic modules
+            node.AddValue("MM_DYNAMIC", "true");
         }
 
     }
