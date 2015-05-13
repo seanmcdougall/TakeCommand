@@ -40,7 +40,7 @@ namespace TakeCommand
         // Whether or not the Kerbal has been ejected and should now be boarded
         private bool boardKerbal = false;
 
-        // Whether processing is complete and the module can remove itself
+        // Whether processing is complete and the module can disable itself
         private bool tcComplete = false;
 
         public override void OnStart(StartState state)
@@ -141,19 +141,14 @@ namespace TakeCommand
 
         public void LateUpdate()
         {
-            // Remove this module after processing all other updates to avoid an error in the log
+            // Disable this module after all other processing is complete
             if (tcComplete)
             {
                 print("[TakeCommand] deactivating module for " + this.part.GetInstanceID());
                 PartModule m = this.part.Modules.OfType<TakeCommand>().Single();
-                this.part.RemoveModule(m);
+                m.enabled = false;
+                m.isEnabled = false;
             }
-        }
-
-        public override void OnSave(ConfigNode node)
-        {
-            // Tell ModuleManager that I use dynamic modules
-            node.AddValue("MM_DYNAMIC", "true");
         }
 
     }
