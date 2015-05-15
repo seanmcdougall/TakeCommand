@@ -8,6 +8,7 @@ Forum Thread
 http://forum.kerbalspaceprogram.com/threads/120740
 
 Downloads
+- CKAN (https://github.com/KSP-CKAN/CKAN)
 - KerbalStuff (https://kerbalstuff.com/mod/776/Take%20Command)
 - Curse (http://www.curse.com/ksp-mods/kerbal/230395-take-command)
 
