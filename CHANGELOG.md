@@ -1,3 +1,6 @@
+1.1.2 (2015/05/15)
+- tweaked MM config again to add ":for" tag
+
 1.1.1 (2015/05/12)
 - tweaked MM config to remove ":final" tag
 - module is now just disabled after processing is complete instead of being removed from the part
