@@ -1,3 +1,7 @@
+1.1.3 (2015/05/21)
+- fixes compatibility issue with Kerbal Inventory System (KIS)
+- fixes compatibility issue with Kerbal Joint Reinforcement (KJR)
+
 1.1.2 (2015/05/15)
 - tweaked MM config again to add ":for" tag
 
