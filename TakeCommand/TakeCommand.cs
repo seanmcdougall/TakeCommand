@@ -95,43 +95,48 @@ namespace TakeCommand
         {
             if (HighLogic.LoadedSceneIsFlight && vessel.Landed && vessel.HoldPhysics == false)
             {
-                if (boardKerbal == false)
+                // Make sure controls are unlocked (workaround for compatibility issue with Kerbal Joint Reinforcement)
+                if (InputLockManager.IsUnlocked(ControlTypes.ALL_SHIP_CONTROLS))
                 {
-                    if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.First().GetInstanceID() == this.part.GetInstanceID())
+                    if (boardKerbal == false)
                     {
-                        // Time to eject this crew member
-                        ProtoCrewMember kerbal = this.part.protoModuleCrew.Single();
-                        print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
-                        if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
+                        if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.First().GetInstanceID() == this.part.GetInstanceID())
                         {
-                            myKerbal = "kerbalEVA (" + kerbal.name + ")";
-                            boardKerbal = true;
-                            escapeHatch.collider.enabled = false;
-                            this.part.airlock = null;
-                            DestroyObject(escapeHatchCollider);
-                            DestroyObject(escapeHatch);
-                            print("[TakeCommand] removed escape hatch from " + this.part.name + " (" + this.part.GetInstanceID() + ")");
-                        }
-                        else
-                        {
-                            print("[TakeCommand] error ejecting " + kerbal.name);
+                            // Time to eject this crew member
+                            ProtoCrewMember kerbal = this.part.protoModuleCrew.Single();
+                            print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
+                            if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
+                            {
+                                myKerbal = "kerbalEVA (" + kerbal.name + ")";
+                                boardKerbal = true;
+                                escapeHatch.collider.enabled = false;
+                                this.part.airlock = null;
+                                DestroyObject(escapeHatchCollider);
+                                DestroyObject(escapeHatch);
+                                print("[TakeCommand] removed escape hatch from " + this.part.name + " (" + this.part.GetInstanceID() + ")");
+                            }
+                            else
+                            {
+                                print("[TakeCommand] error ejecting " + kerbal.name);
+                            }
                         }
                     }
-                }
-                else
-                {
-                    // Check and wait until the ejected Kerbal is the active vessel before proceeding
-                    if (FlightGlobals.ActiveVessel.name == myKerbal)
+                    else
                     {
-                        KerbalEVA kerbal = FlightGlobals.ActiveVessel.GetComponent<KerbalEVA>();
-
-                        if (kerbal.fsm.Started == true)
+                        // Check and wait until the ejected Kerbal is the active vessel before proceeding
+                        if (FlightGlobals.ActiveVessel.name == myKerbal)
                         {
-                            allCommandSeats.Remove(allCommandSeats.First());
-                            boardKerbal = false;
-                            tcComplete = true;
-                            print("[TakeCommand]  seating " + kerbal.name + " in " + this.part.GetInstanceID());
-                            this.part.Modules.OfType<KerbalSeat>().Single().BoardSeat();
+                            KerbalEVA kerbal = FlightGlobals.ActiveVessel.GetComponent<KerbalEVA>();
+
+                            if (kerbal.fsm.Started == true)
+                            {
+                                allCommandSeats.Remove(allCommandSeats.First());
+                                boardKerbal = false;
+                                tcComplete = true;
+
+                                print("[TakeCommand]  seating " + kerbal.name + " in " + this.part.GetInstanceID());
+                                this.part.Modules.OfType<KerbalSeat>().Single().BoardSeat();
+                            }
                         }
                     }
                 }
