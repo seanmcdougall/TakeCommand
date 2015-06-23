@@ -1,3 +1,6 @@
+1.1.4 (2015/06/23)
+- recompiled for KSP 1.0.3
+
 1.1.3 (2015/05/21)
 - fixes compatibility issue with Kerbal Inventory System (KIS)
 - fixes compatibility issue with Kerbal Joint Reinforcement (KJR)
