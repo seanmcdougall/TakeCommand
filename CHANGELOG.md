@@ -1,5 +1,6 @@
 1.1.4 (2015/06/23)
 - recompiled for KSP 1.0.3
+- updated to latest version of ModuleManager
 
 1.1.3 (2015/05/21)
 - fixes compatibility issue with Kerbal Inventory System (KIS)
