@@ -96,7 +96,7 @@ namespace TakeCommand
             if (HighLogic.LoadedSceneIsFlight && vessel.Landed && vessel.HoldPhysics == false)
             {
                 // Make sure controls are unlocked (workaround for compatibility issue with Kerbal Joint Reinforcement)
-                if (InputLockManager.IsUnlocked(ControlTypes.ALL_SHIP_CONTROLS))
+                if (InputLockManager.GetControlLock("KJRLoadLock") != ControlTypes.ALL_SHIP_CONTROLS)
                 {
                     if (boardKerbal == false)
                     {

@@ -1,11 +1,12 @@
 {
 	"NAME":"TakeCommand",
-	"URL":"https://raw.githubusercontent.com/seanmcdougall/TakeCommand/master/TakeCommand/TakeCommand.version",
+	"URL":"https://raw.githubusercontent.com/seanmcdougall/TakeCommand/master/TakeCommand.version",
 	"DOWNLOAD":"http://forum.kerbalspaceprogram.com/threads/120740",
+	"CHANGE_LOG_URL":"https://raw.githubusercontent.com/seanmcdougall/TakeCommand/master/CHANGELOG.md",
 	"VERSION": {
 		"MAJOR":1,
-		"MINOR":1,
-		"PATCH":4,
+		"MINOR":2,
+		"PATCH":0,
 		"BUILD":0
 	},
 	"KSP_VERSION": {
