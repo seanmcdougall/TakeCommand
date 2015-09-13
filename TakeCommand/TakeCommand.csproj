@@ -66,7 +66,7 @@ goto :endIf
 
 :Debug
 echo "Processing Debug post-build"
-"C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\bin\cli.bat"  "C:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe" $(TargetFileName)
+"C:\Program Files (x86)\mono\bin\mono.exe" "C:\Program Files (x86)\mono\lib\mono\4.5\pdb2mdb.exe" $(TargetFileName)
 goto :endIf
 
 :Release
@@ -75,7 +75,7 @@ cd ..\..\
 copy README.md GameData\$(TargetName)
 copy LICENSE.md GameData\$(TargetName)
 del releases\$(TargetName).zip
-7za a -tzip releases\$(TargetName).zip GameData
+c:\windows\7za.exe a -tzip releases\$(TargetName).zip GameData
 goto :endIf
 
 :endIf
