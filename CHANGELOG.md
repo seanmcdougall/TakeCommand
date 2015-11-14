@@ -1,3 +1,7 @@
+1.2.1 (2015/11/14)
+- recompiled for KSP 1.0.5
+- updated to ModuleManager 2.6.13
+
 1.2 (2015/09/04)
 - fixes compatibility issue with Action Groups Extended (and likely other mods as well)
 - updated to use ModuleManager 2.6.8
