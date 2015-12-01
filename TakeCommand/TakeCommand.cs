@@ -36,20 +36,48 @@ namespace TakeCommand
 
         // Name of the Kerbal who belongs in this seat
         private string myKerbal;
-        
+
         // Whether or not the Kerbal has been ejected and should now be boarded
         private bool boardKerbal = false;
-
-        // Whether processing is complete and the module can disable itself
-        private bool tcComplete = false;
 
         public override void OnStart(StartState state)
         {
             if (HighLogic.LoadedSceneIsFlight)
             {
-                if (this.part.protoModuleCrew.Count > 0)
+
+                if (escapeHatch == null)
                 {
-                    if (allCommandSeats.Count == 0)
+                    escapeHatch = new GameObject("EscapeHatch");
+                    escapeHatch.tag = "Airlock";
+                    escapeHatch.layer = 21;
+                    escapeHatch.transform.parent = this.part.transform;
+                    escapeHatch.transform.localEulerAngles = new Vector3(0, 0, 0);
+                    escapeHatch.transform.localPosition = new Vector3(0, 0, 0);
+
+                    escapeHatch.AddComponent<BoxCollider>();
+                    escapeHatchCollider = escapeHatch.GetComponent<BoxCollider>();
+                    escapeHatchCollider.size = new Vector3(0.25f, 0.25f, 0.25f);
+                    escapeHatchCollider.isTrigger = true;
+                    
+                    this.part.airlock = escapeHatch.transform;
+                    print("[TakeCommand] added escape hatch to " + this.part.name + " (" + this.part.GetInstanceID() + ")");
+
+                    // Disable it for now until we need it
+                    escapeHatch.collider.enabled = true;
+                }
+
+            }
+            base.OnStart(state);
+        }
+
+        public override void OnUpdate()
+        {
+            if (HighLogic.LoadedSceneIsFlight && vessel.HoldPhysics == false)
+            {
+                // Make sure controls are unlocked (workaround for compatibility issue with Kerbal Joint Reinforcement)
+                if (InputLockManager.GetControlLock("KJRLoadLock") != ControlTypes.ALL_SHIP_CONTROLS)
+                {
+                    if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.Count == 0)
                     {
                         print("[TakeCommand] populating seat list");
                         foreach (Part p in vessel.parts)
@@ -64,40 +92,6 @@ namespace TakeCommand
                         }
                         print("[TakeCommand] found " + allCommandSeats.Count + " occupied seats");
                     }
-                    if (escapeHatch == null)
-                    {
-                        escapeHatch = new GameObject("EscapeHatch");
-                        escapeHatch.tag = "Airlock";
-                        escapeHatch.layer = 21;
-                        escapeHatch.transform.parent = this.part.transform;
-                        escapeHatch.transform.localEulerAngles = new Vector3(0, 0, 0);
-                        escapeHatch.transform.localPosition = new Vector3(0, 0, 0);
-
-                        escapeHatch.AddComponent<BoxCollider>();
-                        escapeHatchCollider = escapeHatch.GetComponent<BoxCollider>();
-                        escapeHatchCollider.size = new Vector3(0.25f, 0.25f, 0.25f);
-                        escapeHatchCollider.isTrigger = true;
-                        this.part.airlock = escapeHatch.transform;
-                        print("[TakeCommand] added escape hatch to " + this.part.name + " (" + this.part.GetInstanceID() + ")");
-                    }
-                }
-                else
-                {
-                    // No crew left to eject, disable the module
-                    tcComplete = true;
-                    
-                }
-            }
-            base.OnStart(state);
-        }
-
-        public override void OnUpdate()
-        {
-            if (HighLogic.LoadedSceneIsFlight && vessel.Landed && vessel.HoldPhysics == false)
-            {
-                // Make sure controls are unlocked (workaround for compatibility issue with Kerbal Joint Reinforcement)
-                if (InputLockManager.GetControlLock("KJRLoadLock") != ControlTypes.ALL_SHIP_CONTROLS)
-                {
                     if (boardKerbal == false)
                     {
                         if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.First().GetInstanceID() == this.part.GetInstanceID())
@@ -105,15 +99,12 @@ namespace TakeCommand
                             // Time to eject this crew member
                             ProtoCrewMember kerbal = this.part.protoModuleCrew.Single();
                             print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
+                            escapeHatch.collider.enabled = true;
                             if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
                             {
                                 myKerbal = "kerbalEVA (" + kerbal.name + ")";
                                 boardKerbal = true;
                                 escapeHatch.collider.enabled = false;
-                                this.part.airlock = null;
-                                DestroyObject(escapeHatchCollider);
-                                DestroyObject(escapeHatch);
-                                print("[TakeCommand] removed escape hatch from " + this.part.name + " (" + this.part.GetInstanceID() + ")");
                             }
                             else
                             {
@@ -132,7 +123,6 @@ namespace TakeCommand
                             {
                                 allCommandSeats.Remove(allCommandSeats.First());
                                 boardKerbal = false;
-                                tcComplete = true;
 
                                 print("[TakeCommand]  seating " + kerbal.name + " in " + this.part.GetInstanceID());
                                 this.part.Modules.OfType<KerbalSeat>().Single().BoardSeat();
@@ -142,18 +132,6 @@ namespace TakeCommand
                 }
             }
             base.OnUpdate();
-        }
-
-        public void LateUpdate()
-        {
-            // Disable this module after all other processing is complete
-            if (tcComplete)
-            {
-                print("[TakeCommand] deactivating module for " + this.part.GetInstanceID());
-                PartModule m = this.part.Modules.OfType<TakeCommand>().Single();
-                m.enabled = false;
-                m.isEnabled = false;
-            }
         }
 
     }
