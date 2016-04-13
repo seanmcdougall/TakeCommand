@@ -63,7 +63,7 @@ namespace TakeCommand
                     print("[TakeCommand] added escape hatch to " + this.part.name + " (" + this.part.GetInstanceID() + ")");
 
                     // Disable it for now until we need it
-                    escapeHatch.collider.enabled = true;
+                    escapeHatch.GetComponent<Collider>().enabled = true;
                 }
 
             }
@@ -99,12 +99,12 @@ namespace TakeCommand
                             // Time to eject this crew member
                             ProtoCrewMember kerbal = this.part.protoModuleCrew.Single();
                             print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
-                            escapeHatch.collider.enabled = true;
+                            escapeHatch.GetComponent<Collider>().enabled = true;
                             if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
                             {
                                 myKerbal = "kerbalEVA (" + kerbal.name + ")";
                                 boardKerbal = true;
-                                escapeHatch.collider.enabled = false;
+                                escapeHatch.GetComponent<Collider>().enabled = false;
                             }
                             else
                             {
