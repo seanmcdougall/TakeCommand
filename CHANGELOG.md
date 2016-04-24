@@ -1,5 +1,6 @@
-1.4.0 (2015/04/xx)
+1.4.0 (2015/04/24)
 - updated and recompiled for KSP 1.1
+- updated to ModuleManager 2.6.23
 
 1.3.0 (2015/12/06)
 - now allows spawning Kerbals into command seats after launch (i.e. on a crew transfer)
