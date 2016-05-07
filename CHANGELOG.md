@@ -1,3 +1,7 @@
+1.4.1 (2015/05/06)
+- recompiled for KSP 1.1.2
+- updated to ModuleManager 2.6.24
+
 1.4.0 (2015/04/24)
 - updated and recompiled for KSP 1.1
 - updated to ModuleManager 2.6.23
