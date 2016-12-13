@@ -72,7 +72,7 @@ namespace TakeCommand
 
         public override void OnUpdate()
         {
-            if (HighLogic.LoadedSceneIsFlight && vessel.HoldPhysics == false)
+            if (HighLogic.LoadedSceneIsFlight && vessel.HoldPhysics == true)
             {
                 // Make sure controls are unlocked (workaround for compatibility issue with Kerbal Joint Reinforcement)
                 if (InputLockManager.GetControlLock("KJRLoadLock") != ControlTypes.ALL_SHIP_CONTROLS)
