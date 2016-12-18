@@ -1,9 +1,9 @@
 
 
-@echo off
+rem @echo off
 
-copy /Y "bin\Release\TakeCommand.dll" "GameData\TakeCommand\Plugins"
-copy /Y TakeCommand.version ..\..\GameData\TakeCommand
+copy /Y "TakeCommand\bin\Release\TakeCommand.dll" "GameData\TakeCommand\Plugins"
+copy /Y TakeCommand.version GameData\TakeCommand
 copy /Y ..\MiniAVC.dll GameData\TakeCommand
 
 set DEFHOMEDRIVE=d:

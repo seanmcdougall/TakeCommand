@@ -1,3 +1,11 @@
+1.4.2.1 (2016/12/17)
+- Fixed build scripts (paths were wrong)
+- Now contains correct .version file
+
+1.4.2 (2016/12/13)
+- Recompiled for 1.2.2
+- added build scripts integrated with VS
+
 1.4.1 (2015/05/06)
 - recompiled for KSP 1.1.2
 - updated to ModuleManager 2.6.24
