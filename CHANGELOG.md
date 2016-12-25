@@ -1,3 +1,7 @@
+1.4.3
+- Patch added for BetterCrewAssignment
+- Fixed issue when a part has multiple external seats
+
 1.4.2.1 (2016/12/17)
 - Fixed build scripts (paths were wrong)
 - Now contains correct .version file

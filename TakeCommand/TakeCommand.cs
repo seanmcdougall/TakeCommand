@@ -97,18 +97,21 @@ namespace TakeCommand
                         if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.First().GetInstanceID() == this.part.GetInstanceID())
                         {
                             // Time to eject this crew member
-                            ProtoCrewMember kerbal = this.part.protoModuleCrew.Single();
-                            print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
-                            escapeHatch.GetComponent<Collider>().enabled = true;
-                            if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
+                            foreach (var kerbal in this.part.protoModuleCrew)
                             {
-                                myKerbal = "kerbalEVA (" + kerbal.name + ")";
-                                boardKerbal = true;
-                                escapeHatch.GetComponent<Collider>().enabled = false;
-                            }
-                            else
-                            {
-                                print("[TakeCommand] error ejecting " + kerbal.name);
+                                //ProtoCrewMember kerbal = this.part.protoModuleCrew.First();
+                                print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
+                                escapeHatch.GetComponent<Collider>().enabled = true;
+                                if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
+                                {
+                                    myKerbal = "kerbalEVA (" + kerbal.name + ")";
+                                    boardKerbal = true;
+                                    escapeHatch.GetComponent<Collider>().enabled = false;
+                                }
+                                else
+                                {
+                                    print("[TakeCommand] error ejecting " + kerbal.name);
+                                }
                             }
                         }
                     }
@@ -125,7 +128,8 @@ namespace TakeCommand
                                 boardKerbal = false;
 
                                 print("[TakeCommand]  seating " + kerbal.name + " in " + this.part.GetInstanceID());
-                                this.part.Modules.OfType<KerbalSeat>().Single().BoardSeat();
+                                // Board in first unoccupied seat
+                                this.part.Modules.OfType<KerbalSeat>().First(t => t.Occupant == null).BoardSeat();
                             }
                         }
                     }
