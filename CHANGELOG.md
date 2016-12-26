@@ -1,3 +1,7 @@
+1.4.5
+- Added patch for Omicron
+- Added patch form Kerbonov-KN2
+
 1.4.4
 - Added patch for WildBlueIndustries
 - Added patch for USI Exploration
