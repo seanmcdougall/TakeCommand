@@ -1,6 +1,12 @@
+1.4.4
+- Added patch for WildBlueIndustries
+- Added patch for USI Exploration
+- Added patch for NESDparts
+
 1.4.3
 - Patch added for BetterCrewAssignment
 - Fixed issue when a part has multiple external seats
+- Patch added for SXTContinued, for the Lark
 
 1.4.2.1 (2016/12/17)
 - Fixed build scripts (paths were wrong)
