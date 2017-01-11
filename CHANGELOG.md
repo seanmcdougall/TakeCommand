@@ -1,3 +1,10 @@
+1.4.6
+- Updated all patches to add EVA Parachute if that mod is installed
+- removed BetterCrewAssignment (can't do internal transfer to external seat)
+- Moved cfg for stock external command seat to ModuleManager directory
+- Fixed code so that KSP won't try to transfer a kerbal into/outof an external seat
+- Added AssemblyVersion code
+
 1.4.5
 - Added patch for Omicron
 - Added patch form Kerbonov-KN2

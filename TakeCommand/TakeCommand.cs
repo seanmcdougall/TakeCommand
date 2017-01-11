@@ -27,6 +27,9 @@ namespace TakeCommand
 
     public class TakeCommand : ModuleCommand
     {
+        [KSPField]
+        int CrewCapacity = 1;
+
         // Keep track of all the command seats that need to be emptied (shared across all instances)
         public static List<Part> allCommandSeats = new List<Part>();
 
@@ -44,7 +47,9 @@ namespace TakeCommand
         {
             if (HighLogic.LoadedSceneIsFlight)
             {
-
+                // Need to set the capacity to 0 herre so that KSP ddoesn't try to transfer crew into and out of an external seat
+                this.CrewCapacity = this.part.CrewCapacity;
+                this.part.CrewCapacity = 0;
                 if (escapeHatch == null)
                 {
                     escapeHatch = new GameObject("EscapeHatch");
