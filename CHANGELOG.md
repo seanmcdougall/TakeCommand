@@ -1,3 +1,6 @@
+1.4.8
+- Now finds the best kerbal in the seats
+
 1.4.7
 - Added Akita rover seat from USI Konstruction/MKS, thanks Aelfhe1m
 - Added code to override UpdateControlSourceState, to report correct state for external seats
