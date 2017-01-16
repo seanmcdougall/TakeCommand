@@ -1,3 +1,7 @@
+1.4.7
+- Added Akita rover seat from USI Konstruction/MKS, thanks Aelfhe1m
+- Added code to override UpdateControlSourceState, to report correct state for external seats
+
 1.4.6
 - Updated all patches to add EVA Parachute if that mod is installed
 - removed BetterCrewAssignment (can't do internal transfer to external seat)

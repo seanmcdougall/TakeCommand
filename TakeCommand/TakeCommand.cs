@@ -20,7 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CommNet;
 using UnityEngine;
+using Experience.Effects;
 
 namespace TakeCommand
 {
@@ -47,9 +49,10 @@ namespace TakeCommand
         {
             if (HighLogic.LoadedSceneIsFlight)
             {
-                // Need to set the capacity to 0 herre so that KSP ddoesn't try to transfer crew into and out of an external seat
+                // Need to set the capacity to 0 herre so that KSP doesn't try to transfer crew into and out of an external seat
                 this.CrewCapacity = this.part.CrewCapacity;
                 this.part.CrewCapacity = 0;
+
                 if (escapeHatch == null)
                 {
                     escapeHatch = new GameObject("EscapeHatch");
@@ -63,7 +66,7 @@ namespace TakeCommand
                     escapeHatchCollider = escapeHatch.GetComponent<BoxCollider>();
                     escapeHatchCollider.size = new Vector3(0.25f, 0.25f, 0.25f);
                     escapeHatchCollider.isTrigger = true;
-                    
+
                     this.part.airlock = escapeHatch.transform;
                     print("[TakeCommand] added escape hatch to " + this.part.name + " (" + this.part.GetInstanceID() + ")");
 
@@ -73,6 +76,147 @@ namespace TakeCommand
 
             }
             base.OnStart(state);
+        }
+
+        Part getModulePartParent(string moduleToFind, PartModule pm)
+        {
+            Part lastPart = null;
+
+            List<Part> plist = this.vessel.parts;
+            if (plist != null)
+            {
+                for (int i = plist.Count - 1; i >= 0; --i)
+                {
+                    PartModuleList pmoduleList = plist[i].Modules;
+                    for (int i1 = pmoduleList.Count - 1; i1 >= 0; --i1)
+                    {
+                        if (pmoduleList[i1].moduleName == moduleToFind)
+                        {
+                            lastPart = plist[i];
+                            break;
+                        }
+                    }
+                }
+            }
+            return lastPart;
+        }
+
+        public override VesselControlState UpdateControlSourceState()
+        {
+            this.commCapable = false;
+            bool isHibernating = this.IsHibernating;
+            
+            var ks = this.part.Modules.OfType<KerbalSeat>().First();
+
+            if (ks == null)
+            {
+                Debug.Log("Can't find KerbalSeat in part: " + this.part.partInfo.title);
+                return VesselControlState.None;
+            }
+            this.pilots = (this.crewCount = (this.totalCrewCount = 0));
+            // Kerbal kerbal = null;
+            ProtoCrewMember pcm = null;
+            
+            if (ks.Occupant != null)
+            {
+                KerbalEVA keva = ks.Occupant.Modules.OfType<KerbalEVA>().FirstOrDefault();
+                if (keva != null)
+                {
+                    var k = getModulePartParent("KerbalEVA", keva);
+                    if (k != null)
+                        pcm = k.protoModuleCrew[0];
+                }
+            }
+            else
+                Debug.Log("ks.Occupant is null");
+
+            if (pcm != null)
+            {
+                if (pcm.HasEffect<FullVesselControlSkill>() && !pcm.inactive)
+                    this.pilots = 1;
+                if (pcm.type != ProtoCrewMember.KerbalType.Tourist)
+                {
+                    this.totalCrewCount = 1;
+                    if (!pcm.inactive)
+                        this.crewCount = 1;
+                }
+            }
+            else
+                Debug.Log("Kerbal is null");
+
+            if (this.crewCount == 0)
+            {
+                if (pcm.type == ProtoCrewMember.KerbalType.Tourist)
+                {
+                    this.controlSrcStatusText = "Tourists Need Crew";
+                    this.moduleState = ModuleCommand.ModuleControlState.TouristCrew;
+                    return VesselControlState.Kerbal;
+                }
+                this.controlSrcStatusText = "No Crew";
+                this.moduleState = ModuleCommand.ModuleControlState.NotEnoughCrew;
+                return VesselControlState.Kerbal;
+            }
+
+            bool pilotNeededNotAvail = this.requiresPilot && this.pilots == 0;
+            this.commCapable = true;
+            if (CommNetScenario.CommNetEnabled && CommNetScenario.Instance != null)
+            {
+                bool connectionNeededAndConnected = this.Connection != null && this.Connection.IsConnected;
+
+                if (!this.remoteControl && !connectionNeededAndConnected && pilotNeededNotAvail)
+                {
+                    if (this.controlSrcStatusText != "No Pilot")
+                        this.controlSrcStatusText = "No Pilot";
+
+                    this.moduleState = ModuleCommand.ModuleControlState.PartialManned;
+                    return VesselControlState.KerbalPartial;
+                }
+                if (!connectionNeededAndConnected)
+                {
+                    if (this.totalCrewCount == 0)
+                    {
+                        if (this.SignalRequired || !this.remoteControl)
+                        {
+                            if (this.controlSrcStatusText != "No Telemetry")
+                                this.controlSrcStatusText = "No Telemetry";
+
+                            this.moduleState = ModuleCommand.ModuleControlState.NoControlPoint;
+                            return VesselControlState.Probe;
+                        }
+                        if (this.requiresTelemetry)
+                        {
+                            if (this.controlSrcStatusText != "Partial Control")
+                                this.controlSrcStatusText = "Partial Control";
+
+                            this.moduleState = ModuleCommand.ModuleControlState.PartialProbe;
+                            return VesselControlState.ProbePartial;
+                        }
+                    }
+                }
+            }
+
+            if (isHibernating)
+            {
+                if (this.controlSrcStatusText != "Hibernating")
+                    this.controlSrcStatusText = "Hibernating";
+
+                if (this.minimumCrew > 0)
+                {
+                    this.moduleState = ModuleCommand.ModuleControlState.PartialManned;
+                    return VesselControlState.KerbalPartial;
+                }
+                this.moduleState = ModuleCommand.ModuleControlState.PartialProbe;
+                return VesselControlState.ProbePartial;
+            }
+            else
+            {
+                if (this.controlSrcStatusText != "Operational")
+                    this.controlSrcStatusText = "Operational";
+                this.moduleState = ModuleCommand.ModuleControlState.Nominal;
+                if (this.minimumCrew > 0)
+                    return VesselControlState.KerbalFull;
+                return VesselControlState.ProbeFull;
+            }
         }
 
         public override void OnUpdate()
@@ -97,19 +241,25 @@ namespace TakeCommand
                         }
                         print("[TakeCommand] found " + allCommandSeats.Count + " occupied seats");
                     }
+
                     if (boardKerbal == false)
                     {
+                        Debug.Log("boardKerbal");
                         if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.First().GetInstanceID() == this.part.GetInstanceID())
                         {
                             // Time to eject this crew member
-                            foreach (var kerbal in this.part.protoModuleCrew)
+                            ProtoCrewMember kerbal;
+                            while (this.part.protoModuleCrew.Count() > 0)
                             {
+                                kerbal = this.part.protoModuleCrew[0];
                                 //ProtoCrewMember kerbal = this.part.protoModuleCrew.First();
                                 print("[TakeCommand] ejecting " + kerbal.name + " from " + this.part.GetInstanceID());
                                 escapeHatch.GetComponent<Collider>().enabled = true;
+                                Debug.Log("eject 1");
                                 if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
                                 {
                                     myKerbal = "kerbalEVA (" + kerbal.name + ")";
+
                                     boardKerbal = true;
                                     escapeHatch.GetComponent<Collider>().enabled = false;
                                 }
@@ -123,6 +273,9 @@ namespace TakeCommand
                     else
                     {
                         // Check and wait until the ejected Kerbal is the active vessel before proceeding
+                        Debug.Log("activevessel.name: " + FlightGlobals.ActiveVessel.name);
+                        if (this.vessel == FlightGlobals.ActiveVessel)
+                            Debug.Log("this.vessel is activevessel, myKerbal: " + myKerbal);
                         if (FlightGlobals.ActiveVessel.name == myKerbal)
                         {
                             KerbalEVA kerbal = FlightGlobals.ActiveVessel.GetComponent<KerbalEVA>();
@@ -134,7 +287,10 @@ namespace TakeCommand
 
                                 print("[TakeCommand]  seating " + kerbal.name + " in " + this.part.GetInstanceID());
                                 // Board in first unoccupied seat
-                                this.part.Modules.OfType<KerbalSeat>().First(t => t.Occupant == null).BoardSeat();
+                                var freeModule = this.part.Modules.OfType<KerbalSeat>().First(t => t.Occupant == null);
+
+                                freeModule.BoardSeat();
+
                             }
                         }
                     }
