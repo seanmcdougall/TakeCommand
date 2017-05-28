@@ -304,7 +304,8 @@ namespace TakeCommand
                         }
                         print("[TakeCommand] found " + allCommandSeats.Count + " occupied seats");
                     }
-
+                    Log.Info("this.part.protoModuleCrew.Count: " + this.part.protoModuleCrew.Count());
+#if true
                     if (boardKerbal == false)
                     {
                         Log.Info("boardKerbal");
@@ -356,6 +357,7 @@ namespace TakeCommand
                             }
                         }
                     }
+#endif
                 }
             }
             base.OnUpdate();
