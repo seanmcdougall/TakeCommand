@@ -1,3 +1,9 @@
+1.4.9.1
+- Added MM patch to add add AutoAction function to External Command Seat-like parts. 
+
+1.4.9
+- Updated for 1.3
+
 1.4.8
 - Now finds the best kerbal in the seats
 
