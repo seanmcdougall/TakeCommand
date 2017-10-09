@@ -1,4 +1,4 @@
 
-set H=R:\KSP_1.3.0_dev
+set H=R:\KSP_1.3.1_dev
 cd GameData
-xcopy /y/s TakeCommand  "%H%\GameData\TakeCommand"
+xcopy /y/s /i TakeCommand  "%H%\GameData\TakeCommand"
