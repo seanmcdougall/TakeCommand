@@ -1,3 +1,10 @@
+1.4.11
+- Added check for external seat being inside fairing
+- Added Jenkins build
+
+1.4.10.1
+ - Updated MM dll
+
 1.4.10
  - Updated for 1.3.1
 
