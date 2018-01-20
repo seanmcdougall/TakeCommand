@@ -377,6 +377,9 @@ namespace TakeCommand
                                         allCommandSeats.Remove(allCommandSeats.First());
                                         boardKerbal = false;
 
+                                        if (kerbal.flagItems == 0)
+                                            kerbal.AddFlag();
+
                                         print("[TakeCommand]  seating " + kerbal.name + " in " + this.part.GetInstanceID());
                                         // Board in first unoccupied seat
                                         var freeModule = this.part.Modules.OfType<KerbalSeat>().First(t => t.Occupant == null);
