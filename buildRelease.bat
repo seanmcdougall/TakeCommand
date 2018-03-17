@@ -1,17 +1,50 @@
 
+@echo off
 
-rem @echo off
+rem Put the following text into the Post-build event command line:
+rem without the "rem":
 
-copy /Y "TakeCommand\bin\Release\TakeCommand.dll" "GameData\TakeCommand\Plugins"
-copy /Y TakeCommand.version GameData\TakeCommand
-copy /Y ..\MiniAVC.dll GameData\TakeCommand
+rem start /D D:\Users\jbb\github\IFI-Life-Support /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
+rem 
+rem if $(ConfigurationName) == Release (
+rem 
+rem start /D D:\Users\jbb\github\IFI-Life-Support /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
+rem 
+rem )
+
+
+rem Set variables here
+
+rem H is the destination game folder
+rem GAMEDIR is the name of the mod folder (usually the mod name)
+rem GAMEDATA is the name of the local GameData
+rem VERSIONFILE is the name of the version file, usually the same as GAMEDATA,
+rem    but not always
+rem LICENSE is the license file
+rem README is the readme file
+
+set GAMEDIR=TakeCommand
+set GAMEDATA="GameData\"
+set VERSIONFILE=%GAMEDIR%.version
+set LICENSE=LICENSE.md
+set README=README.md
 
 set RELEASEDIR=d:\Users\jbb\release
 set ZIP="c:\Program Files\7-zip\7z.exe"
 
+rem Copy files to GameData locations
 
-set VERSIONFILE=TakeCommand.version
+copy /Y "%1%2" "%GAMEDATA%\%GAMEDIR%\Plugins"
+copy /Y %VERSIONFILE% %GAMEDATA%\%GAMEDIR%
+copy /Y ..\MiniAVC.dll %GAMEDATA%\%GAMEDIR%
 
+if "%LICENSE%" NEQ "" copy /y  %LICENSE% %GAMEDATA%\%GAMEDIR%
+if "%README%" NEQ "" copy /Y %README% %GAMEDATA%\%GAMEDIR%
+
+rem Get Version info
+
+copy %VERSIONFILE% tmp.version
+set VERSIONFILE=tmp.version
 rem The following requires the JQ program, available here: https://stedolan.github.io/jq/download/
 c:\local\jq-win64  ".VERSION.MAJOR" %VERSIONFILE% >tmpfile
 set /P major=<tmpfile
@@ -25,17 +58,18 @@ set /P patch=<tmpfile
 c:\local\jq-win64  ".VERSION.BUILD"  %VERSIONFILE% >tmpfile
 set /P build=<tmpfile
 del tmpfile
+del tmp.version
 set VERSION=%major%.%minor%.%patch%
 if "%build%" NEQ "0"  set VERSION=%VERSION%.%build%
 
-type TakeCommand.version
+echo Version:  %VERSION%
 
-echo Version: %VERSION%
 
-copy /Y README.md GameData\TakeCommand
-copy /Y LICENSE.md GameData\TakeCommand
- 
+rem Build the zip FILE
+cd %GAMEDATA%\..
 
-set FILE="%RELEASEDIR%\TakeCommand-%VERSION%.zip"
+set FILE="%RELEASEDIR%\%GAMEDIR%-%VERSION%.zip"
 IF EXIST %FILE% del /F %FILE%
 %ZIP% a -tzip %FILE% GameData
+
+pause
