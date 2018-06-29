@@ -42,11 +42,13 @@ namespace TakeCommand
 
         // Name of the Kerbal who belongs in this seat
         private string myKerbal;
+        private string myFemaleKerbal;
 
         // Whether or not the Kerbal has been ejected and should now be boarded
         private bool boardKerbal = false;
 
         private bool error = false;
+        private bool editorStart = true;
 
         public override void OnStart(StartState state)
         {
@@ -180,6 +182,9 @@ namespace TakeCommand
             else
             {
                 Log.Info("No occupant in any seat");
+                Log.Info("this.vessel.name: " + this.vessel.name);
+                Log.Info("FlightGlobals.ActiveVessel.name: " + FlightGlobals.ActiveVessel.name);
+
                 this.controlSrcStatusText = "No Crew";
                 this.moduleState = ModuleCommand.ModuleControlState.NotEnoughCrew;
                 return VesselControlState.Kerbal;
@@ -284,16 +289,23 @@ namespace TakeCommand
         }
         void Update()
         {
-            if (HighLogic.LoadedSceneIsEditor && error)
+            if (HighLogic.LoadedSceneIsEditor)
             {
-                error = false;
-                allCommandSeats.Clear();
+                if (error || editorStart)
+                {
+                    error = false;
+                    editorStart = false;
+
+                    allCommandSeats.Clear();
+                }
             }
+            else editorStart = true;
 
         }
         public override void OnUpdate()
         {
-            if (HighLogic.LoadedSceneIsFlight && vessel.HoldPhysics == true)
+            Log.Info("OnUpdate 1");
+            if (HighLogic.LoadedSceneIsFlight) // && vessel.HoldPhysics == true)
             {
                 // Make sure controls are unlocked (workaround for compatibility issue with Kerbal Joint Reinforcement)
                 if (InputLockManager.GetControlLock("KJRLoadLock") != ControlTypes.ALL_SHIP_CONTROLS)
@@ -318,6 +330,8 @@ namespace TakeCommand
 #if true
                     if (!error)
                     {
+                        Log.Info("OnUpdate 2");
+
                         if (FlightEVA.hatchInsideFairing(this.part))
                         {
                             ScreenMessages.PostScreenMessage(part.partInfo.title + " is inside a fairing (not allowed)", 15.0f, ScreenMessageStyle.UPPER_CENTER);
@@ -326,8 +340,12 @@ namespace TakeCommand
                         }
                         else
                         {
+                            Log.Info("OnUpdate 3");
+
                             if (boardKerbal == false)
                             {
+                                Log.Info("OnUpdate 4");
+
                                 Log.Info("boardKerbal");
                                 if (this.part.protoModuleCrew.Count > 0 && allCommandSeats.First().GetInstanceID() == this.part.GetInstanceID())
                                 {
@@ -343,6 +361,7 @@ namespace TakeCommand
                                         if (FlightEVA.fetch.spawnEVA(kerbal, this.part, escapeHatch.transform))
                                         {
                                             myKerbal = "kerbalEVA (" + kerbal.name + ")";
+                                            myFemaleKerbal = "kerbalEVAfemale (" + kerbal.name + ")";
 
                                             boardKerbal = true;
                                             escapeHatch.GetComponent<Collider>().enabled = false;
@@ -364,17 +383,21 @@ namespace TakeCommand
                             }
                             else
                             {
+                                Log.Info("OnUpdate 5");
+
                                 // Check and wait until the ejected Kerbal is the active vessel before proceeding
-                                Log.Info("activevessel.name: " + FlightGlobals.ActiveVessel.name);
+                                Log.Info("this.vessel.name: " + this.vessel.name);
+                                Log.Info("FlightGlobals.ActiveVessel.name: " + FlightGlobals.ActiveVessel.name);
                                 if (this.vessel == FlightGlobals.ActiveVessel)
                                     Log.Info("this.vessel is activevessel, myKerbal: " + myKerbal);
-                                if (FlightGlobals.ActiveVessel.name == myKerbal)
+                                if (FlightGlobals.ActiveVessel.name == myKerbal || FlightGlobals.ActiveVessel.name == myFemaleKerbal)
                                 {
                                     KerbalEVA kerbal = FlightGlobals.ActiveVessel.GetComponent<KerbalEVA>();
-
+                                    Log.Info("kerbal.fsm.currentStateName: " + kerbal.fsm.currentStateName);
                                     if (kerbal.fsm.Started == true)
                                     {
                                         allCommandSeats.Remove(allCommandSeats.First());
+                                        //allCommandSeats.Remove(this.part);
                                         boardKerbal = false;
 
                                         if (kerbal.flagItems == 0)
