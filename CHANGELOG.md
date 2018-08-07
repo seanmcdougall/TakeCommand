@@ -1,3 +1,7 @@
+1.4.12.2
+	Updated .version file for all of 1.4
+	Added OpenCockpit rear gunner seat
+
 1.4.12.1
 	Added fix so returning to editor won't prevent spawning again
 	Added check for female kerbal 
