@@ -1,3 +1,71 @@
+1.4.12.2
+	Updated .version file for all of 1.4
+	Added OpenCockpit rear gunner seat
+
+1.4.12.1
+	Added fix so returning to editor won't prevent spawning again
+	Added check for female kerbal 
+
+1.4.12
+	Updated for 1.4.1
+	Updated build scripts
+	Updated version file
+
+1.4.11.1
+	Added line for the Stockalike Mk1 Open Cockpit in the patch to add a vesselType line
+
+1.4.11
+- Added check for external seat being inside fairing
+- Added Jenkins build
+
+1.4.10.1
+ - Updated MM dll
+
+1.4.10
+ - Updated for 1.3.1
+
+1.4.9.1
+- Added MM patch to add add AutoAction function to External Command Seat-like parts. 
+
+1.4.9
+- Updated for 1.3
+
+1.4.8
+- Now finds the best kerbal in the seats
+
+1.4.7
+- Added Akita rover seat from USI Konstruction/MKS, thanks Aelfhe1m
+- Added code to override UpdateControlSourceState, to report correct state for external seats
+
+1.4.6
+- Updated all patches to add EVA Parachute if that mod is installed
+- removed BetterCrewAssignment (can't do internal transfer to external seat)
+- Moved cfg for stock external command seat to ModuleManager directory
+- Fixed code so that KSP won't try to transfer a kerbal into/outof an external seat
+- Added AssemblyVersion code
+
+1.4.5
+- Added patch for Omicron
+- Added patch form Kerbonov-KN2
+
+1.4.4
+- Added patch for WildBlueIndustries
+- Added patch for USI Exploration
+- Added patch for NESDparts
+
+1.4.3
+- Patch added for BetterCrewAssignment
+- Fixed issue when a part has multiple external seats
+- Patch added for SXTContinued, for the Lark
+
+1.4.2.1 (2016/12/17)
+- Fixed build scripts (paths were wrong)
+- Now contains correct .version file
+
+1.4.2 (2016/12/13)
+- Recompiled for 1.2.2
+- added build scripts integrated with VS
+
 1.4.1 (2015/05/06)
 - recompiled for KSP 1.1.2
 - updated to ModuleManager 2.6.24
